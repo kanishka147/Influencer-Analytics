@@ -122,12 +122,8 @@ const generateAIAnalytics = async (influencer, brandName, brandCategory) => {
     };
   } catch (error) {
     console.error("AI Analytics failed:", error.message);
-    let errorMessage = 'AI analysis temporarily unavailable - showing estimated data.';
-    if (error.message.includes('API_KEY_INVALID')) {
-      errorMessage = 'Invalid API Key - Please check Render settings.';
-    } else if (error.message.includes('User location is not supported')) {
-      errorMessage = 'Gemini API is not supported in this region.';
-    }
+    const rawError = error.message || 'Unknown AI Error';
+    const errorMessage = `Gemini Error: ${rawError}`;
       
     return { 
       pros: [`Analyzed based on follower count (${influencer.followers}) and engagement (${influencer.engagementRate}%).`], 
