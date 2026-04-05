@@ -105,7 +105,7 @@ const generateAIAnalytics = async (influencer, brandName, brandCategory) => {
     No additional text, markdown, or commentary.`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
+      model: 'gemini-1.5-flash',
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
     });
     
@@ -122,8 +122,9 @@ const generateAIAnalytics = async (influencer, brandName, brandCategory) => {
     };
   } catch (error) {
     console.error("AI Analytics failed:", error.message);
-    const rawError = error.message || 'Unknown AI Error';
-    const errorMessage = `Gemini Error: ${rawError}`;
+    const errorMessage = error.message.includes('429') || error.message.includes('EXHAUSTED')
+      ? 'AI Quota exceeded - please try again in a few minutes.'
+      : 'AI temporarily restricted - showing estimated data.';
       
     return { 
       pros: [`Analyzed based on follower count (${influencer.followers}) and engagement (${influencer.engagementRate}%).`], 
