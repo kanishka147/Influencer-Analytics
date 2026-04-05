@@ -8,6 +8,7 @@ import { ArrowLeft, Activity, Users, Tag, DollarSign, CheckCircle2, XCircle, Shi
 const ReportDisplay = () => {
   const { id } = useParams();
   const [report, setReport] = useState(null);
+  const [updateLoading, setUpdateLoading] = useState(false);
 
   useEffect(() => {
     api.get(`/reports/${id}`)
@@ -15,7 +16,24 @@ const ReportDisplay = () => {
       .catch(err => console.error(err));
   }, [id]);
 
-  if (!report) return <div>Loading...</div>;
+  const handleStatusChange = async (newStatus) => {
+    if (!report) return;
+    setUpdateLoading(true);
+    try {
+      const res = await api.patch(`/reports/${id}/status`, { status: newStatus });
+      setReport(res.data);
+    } catch (e) {
+      console.error('Failed to update status:', e);
+    } finally {
+      setUpdateLoading(false);
+    }
+  };
+
+  if (!report) return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh' }}>
+      <div className="spinner" />
+    </div>
+  );
 
   const { influencerId, brandName, pros, cons, earningsEstimate, score } = report;
 
@@ -38,14 +56,35 @@ const ReportDisplay = () => {
           <h1 style={{ fontSize: 26, fontWeight: 800, color: '#1E1B4B', margin: 0 }}>
             Intelligence <span className="text-gradient">Report</span>
           </h1>
-          <p style={{ color: '#6B7280', fontSize: 14, marginTop: 4 }}>AI-driven actionable fit assessment</p>
+          <p style={{ color: '#6B7280', fontSize: 13, marginTop: 4 }}>Analyzed on {new Date(report.createdAt).toLocaleDateString()}</p>
         </div>
-        <div style={{ display: 'flex', gap: 10 }} className="no-print">
-          <button onClick={handleDownloadPDF} className="btn-primary">
-            <Printer size={15} /> Export PDF
+
+        <div style={{ display: 'flex', gap: 12 }}>
+          <select 
+            value={report.status} 
+            disabled={updateLoading}
+            onChange={(e) => handleStatusChange(e.target.value)}
+            style={{ 
+              padding: '8px 12px', 
+              borderRadius: 8, 
+              border: '1px solid #E5E7EB', 
+              fontSize: 13, 
+              fontWeight: 600,
+              cursor: 'pointer',
+              background: 'white'
+            }}
+          >
+            {['Draft', 'Pitch Sent', 'Negotiating', 'Active', 'Completed'].map(s => (
+              <option key={s} value={s}>{s}</option>
+            ))}
+          </select>
+          <button onClick={handleDownloadPDF} className="btn-secondary" style={{ padding: '8px 16px' }}>
+            <Printer size={16} />
+            Export
           </button>
-          <Link to="/dashboard" className="btn-ghost" style={{ textDecoration: 'none' }}>
-            <ArrowLeft size={15} /> Dashboard
+          <Link to="/dashboard" className="btn-secondary" style={{ padding: '8px 16px', textDecoration: 'none' }}>
+            <ArrowLeft size={16} />
+            Dashboard
           </Link>
         </div>
       </div>

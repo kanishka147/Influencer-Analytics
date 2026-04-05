@@ -119,11 +119,17 @@ const generateAIAnalytics = async (influencer, brandName, brandCategory) => {
       earningsEstimate: Number(result.earningsEstimate) || 0
     };
   } catch (error) {
-    console.error("AI Analytics failed, falling back manually...", error.message);
-    // Note: influencer is passed in as a parameter, so we CAN use it here
+    console.error("AI Analytics failed:", error.message);
+    let errorMessage = 'AI analysis temporarily unavailable - showing estimated data.';
+    if (error.message.includes('API_KEY_INVALID')) {
+      errorMessage = 'Invalid API Key - Please check Render settings.';
+    } else if (error.message.includes('User location is not supported')) {
+      errorMessage = 'Gemini API is not supported in this region.';
+    }
+      
     return { 
-      pros: [`High engagement rate of ${influencer.engagementRate}%, indicating strong audience connection.`], 
-      cons: ['AI analysis temporarily unavailable - showing estimated data.'],
+      pros: [`Analyzed based on follower count (${influencer.followers}) and engagement (${influencer.engagementRate}%).`], 
+      cons: [errorMessage],
       earningsEstimate: 0,
       score: 'Average'
     };
