@@ -105,12 +105,14 @@ const generateAIAnalytics = async (influencer, brandName, brandCategory) => {
     No additional text, markdown, or commentary.`;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-2.0-flash',
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
     });
     
-    const text = response.text().replace(/```json/gi, '').replace(/```/g, '').trim();
-    const result = JSON.parse(text);
+    // The new SDK uses .text (property), not .text() (function)
+    // We also clean the string in case the AI added markdown blocks
+    const cleanText = response.text.replace(/```json/gi, '').replace(/```/g, '').trim();
+    const result = JSON.parse(cleanText);
     
     return { 
       pros: result.pros || [], 
