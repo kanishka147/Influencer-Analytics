@@ -274,3 +274,19 @@ exports.getInfluencerReports = async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 };
+
+exports.getReportById = async (req, res) => {
+  try {
+    const report = await Report.findOne({
+      _id: req.params.id,
+      userId: req.user.id
+    }).populate('influencerId');
+    if (!report) {
+      return res.status(404).json({ error: 'Report not found' });
+    }
+    res.json(report);
+  } catch (error) {
+    console.error('Error fetching report:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};

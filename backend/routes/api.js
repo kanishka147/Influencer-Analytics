@@ -17,6 +17,7 @@ router.get('/users', auth, analyticsController.getAllInfluencers);
 // Analytics & Reports (Protected)
 router.post('/analyze', auth, analyticsController.generateReport);
 router.get('/reports', auth, analyticsController.getAllReports);
+router.get('/reports/:id', auth, analyticsController.getReportById);
 router.patch('/reports/:id/status', auth, analyticsController.updateReportStatus);
 
 // Influencer Profile
