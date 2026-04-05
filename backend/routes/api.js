@@ -5,8 +5,8 @@ const authController = require('../controllers/authController');
 const auth = require('../middleware/auth');
 
 // Auth Routes
-router.post('/register', authController.register);
-router.post('/login', authController.login);
+router.post('/auth/register', authController.register);
+router.post('/auth/login', authController.login);
 router.get('/auth/me', auth, authController.getMe);
 router.put('/auth/profile', auth, authController.updateProfile);
 
